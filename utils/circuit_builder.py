@@ -10,6 +10,7 @@ This module keeps the existing show_circuit_builder() entry point and includes:
 - live metrics and live generation-vs-consumption chart
 - Asset ID attached to the circuit and simulation
 - latest virtual sensor values returned to the parent application
+- automatic fault alarm sounds for injected circuit conditions
 
 Important:
 The uploaded image is treated as a visual reference. Without a dedicated
@@ -24,6 +25,7 @@ import os
 import time
 import math
 import random
+from pathlib import Path
 from datetime import datetime
 
 import streamlit as st
@@ -33,6 +35,7 @@ try:
 except Exception:
     Image = None
     ImageOps = None
+
 
 # ============================================================
 # GRID ASSET MANAGEMENT
@@ -46,10 +49,202 @@ from utils.asset_manager import (
 
 
 # ============================================================
+# PATHS
+# ============================================================
+
+# circuit_builder.py is inside:
+# Voltora/utils/circuit_builder.py
+#
+# Therefore parent.parent points to:
+# Voltora/
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+ASSETS_DIR = BASE_DIR / "assets"
+
+
+# ============================================================
+# ALARM FILES
+# ============================================================
+
+ALARM_FILES = {
+    "Overload": "overload.mp3",
+    "Overvoltage": "overvoltage.mp3",
+    "Undervoltage": "undervoltage.mp3",
+    "Line Break": "emergency.mp3",
+}
+
+
+# ============================================================
+# FAULT NORMALIZATION
+# ============================================================
+
+def _normalize_fault(fault):
+    """Convert simulation fault names to consistent display names."""
+
+    if fault is None:
+        return "Normal"
+
+    fault = str(fault).strip().upper()
+
+    mapping = {
+        "NORMAL": "Normal",
+        "OVERLOAD": "Overload",
+        "OVERVOLTAGE": "Overvoltage",
+        "UNDERVOLTAGE": "Undervoltage",
+        "LINE BREAK": "Line Break",
+        "LINE_BREAK": "Line Break",
+    }
+
+    return mapping.get(
+        fault,
+        str(fault).title(),
+    )
+
+
+# ============================================================
+# GET ALARM FILE
+# ============================================================
+
+def _get_alarm_file(fault):
+    """Return the alarm audio path for a circuit fault."""
+
+    fault = _normalize_fault(fault)
+
+    filename = ALARM_FILES.get(fault)
+
+    if not filename:
+        return None
+
+    return ASSETS_DIR / filename
+
+
+# ============================================================
+# TRIGGER ALARM
+# ============================================================
+
+def _trigger_alarm(fault):
+    """
+    Trigger the appropriate alarm when the circuit changes into
+    a fault condition.
+
+    The alarm is triggered only when the fault changes. This prevents
+    the sound from replaying every time Streamlit reruns the app.
+    """
+
+    fault = _normalize_fault(fault)
+
+    previous_fault = _normalize_fault(
+        st.session_state.get(
+            "circuit_previous_fault",
+            "Normal",
+        )
+    )
+
+    # --------------------------------------------------------
+    # NORMAL CONDITION
+    # --------------------------------------------------------
+
+    if fault == "Normal":
+
+        st.session_state.circuit_alarm_triggered = False
+
+        st.session_state.circuit_previous_fault = "Normal"
+
+        return
+
+    # --------------------------------------------------------
+    # NEW FAULT EVENT
+    # --------------------------------------------------------
+
+    new_fault_event = (
+        fault != previous_fault
+    )
+
+    alarm_file = _get_alarm_file(
+        fault
+    )
+
+    if new_fault_event:
+
+        st.session_state.circuit_alarm_triggered = True
+
+        # ----------------------------------------------------
+        # FILE EXISTS
+        # ----------------------------------------------------
+
+        if alarm_file and alarm_file.exists():
+
+            try:
+
+                with open(
+                    alarm_file,
+                    "rb",
+                ) as audio_file:
+
+                    audio_bytes = audio_file.read()
+
+                st.audio(
+                    audio_bytes,
+                    format="audio/mp3",
+                    autoplay=True,
+                )
+
+                st.warning(
+                    f"🔊 **{fault} alarm activated**"
+                )
+
+            except Exception as exc:
+
+                st.error(
+                    f"⚠️ Could not play {fault} alarm: {exc}"
+                )
+
+        # ----------------------------------------------------
+        # FILE DOES NOT EXIST
+        # ----------------------------------------------------
+
+        else:
+
+            expected_file = (
+                str(alarm_file)
+                if alarm_file
+                else "Unknown"
+            )
+
+            st.error(
+                f"🔊 Alarm file not found for "
+                f"**{fault}**.\n\n"
+                f"Expected:\n`{expected_file}`"
+            )
+
+    # --------------------------------------------------------
+    # SAVE CURRENT FAULT
+    # --------------------------------------------------------
+
+    st.session_state.circuit_previous_fault = fault
+
+
+# ============================================================
+# RESET ALARM STATE
+# ============================================================
+
+def _reset_alarm_state():
+
+    st.session_state.circuit_previous_fault = "Normal"
+
+    st.session_state.circuit_alarm_triggered = False
+
+
+# ============================================================
 # UI HELPER
 # ============================================================
 
-def _box(title, body, border="#64748b"):
+def _box(
+    title,
+    body,
+    border="#64748b",
+):
+
     return (
         '<div style="padding:14px 12px;border-radius:14px;border:2px solid '
         f'{border};background:#0b1220;text-align:center;min-width:135px;'
@@ -66,6 +261,7 @@ def _analyze_image(uploaded):
     """Perform safe local image analysis."""
 
     if Image is None:
+
         return {
             "status": "Pillow is not installed",
             "width": 0,
@@ -77,29 +273,50 @@ def _analyze_image(uploaded):
             "complexity": "-",
         }
 
-    img = Image.open(uploaded).convert("RGB")
+    img = Image.open(
+        uploaded
+    ).convert(
+        "RGB"
+    )
 
     width, height = img.size
 
-    aspect = width / max(height, 1)
+    aspect = width / max(
+        height,
+        1,
+    )
 
-    gray = ImageOps.grayscale(img)
+    gray = ImageOps.grayscale(
+        img
+    )
 
     small = gray.copy()
-    small.thumbnail((900, 900))
 
-    px = list(small.getdata())
+    small.thumbnail(
+        (
+            900,
+            900,
+        )
+    )
+
+    px = list(
+        small.getdata()
+    )
 
     if px:
 
         mean = sum(px) / len(px)
 
         variance = sum(
-            (p - mean) ** 2
+            (
+                p - mean
+            ) ** 2
             for p in px
         ) / len(px)
 
-        contrast = math.sqrt(variance)
+        contrast = math.sqrt(
+            variance
+        )
 
     else:
 
@@ -165,6 +382,9 @@ def _reset_simulation():
     st.session_state.sim_tick = 0
 
     st.session_state.latest_simulation = None
+
+    # Reset alarm state as well
+    _reset_alarm_state()
 
 
 # ============================================================
@@ -423,7 +643,9 @@ def _run_simulation_step(
         [],
     )
 
-    history.append(sample)
+    history.append(
+        sample
+    )
 
     st.session_state.sim_history = (
         history[-30:]
@@ -437,7 +659,17 @@ def _run_simulation_step(
         + 1
     )
 
-    st.session_state.latest_simulation = sample
+    st.session_state.latest_simulation = (
+        sample
+    )
+
+    # ========================================================
+    # 🔊 TRIGGER CIRCUIT ALARM
+    # ========================================================
+
+    _trigger_alarm(
+        sample["fault"]
+    )
 
     return sample
 
@@ -616,7 +848,9 @@ def show_circuit_builder():
             "analysis_done"
         ):
 
-            info = st.session_state.diagram_analysis
+            info = (
+                st.session_state.diagram_analysis
+            )
 
             st.success(
                 "Diagram analyzed. Review the suggested "
@@ -656,9 +890,13 @@ def show_circuit_builder():
 
             cols = st.columns(4)
 
-            for idx, name in enumerate(comps):
+            for idx, name in enumerate(
+                comps
+            ):
 
-                with cols[idx % 4]:
+                with cols[
+                    idx % 4
+                ]:
 
                     comps[name] = st.checkbox(
                         name,
@@ -666,14 +904,20 @@ def show_circuit_builder():
                         key=f"det_{idx}_{name}",
                     )
 
-            st.session_state.detected_components = comps
+            st.session_state.detected_components = (
+                comps
+            )
 
     elif os.path.exists(
-        "assets/lt_3phase_reference.png"
+        BASE_DIR
+        / "assets"
+        / "lt_3phase_reference.png"
     ):
 
         st.image(
-            "assets/lt_3phase_reference.png",
+            BASE_DIR
+            / "assets"
+            / "lt_3phase_reference.png",
             caption="Default LT Reference Diagram",
             use_container_width=True,
         )
@@ -926,6 +1170,13 @@ def show_circuit_builder():
 
             _reset_simulation()
 
+            # Set initial fault state according to the
+            # currently selected condition.
+            #
+            # This is intentionally Normal so the first
+            # simulation of a fault generates an alarm.
+            _reset_alarm_state()
+
             st.success(
                 f"Circuit built successfully for "
                 f"{selected_line} / {selected_asset_id}."
@@ -962,7 +1213,9 @@ def show_circuit_builder():
             "Overvoltage": "#a78bfa",
             "Undervoltage": "#eab308",
             "Line Break": "#ef4444",
-        }[circuit_condition]
+        }[
+            circuit_condition
+        ]
 
         st.info(
             f"📍 **Area:** {selected_area}  |  "
@@ -1025,7 +1278,7 @@ def show_circuit_builder():
             unsafe_allow_html=True,
         )
 
-                # ----------------------------------------------------
+        # ----------------------------------------------------
         # LT FEEDER
         # ----------------------------------------------------
 
@@ -1165,9 +1418,11 @@ def show_circuit_builder():
                         {icon}<br>
                         <b>{name}</b><br>
                         {category}<br>
-                        {"<b>" + power + "</b>"
-                         if enabled
-                         else "Disconnected"}
+                        {
+                            "<b>" + power + "</b>"
+                            if enabled
+                            else "Disconnected"
+                        }
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -1331,6 +1586,43 @@ def show_circuit_builder():
         )
 
         # ====================================================
+        # ALARM STATUS PANEL
+        # ====================================================
+
+        current_alarm_fault = _normalize_fault(
+            circuit_condition
+        )
+
+        if current_alarm_fault == "Normal":
+
+            st.success(
+                "🔇 Alarm system: STANDBY — circuit is normal."
+            )
+
+        else:
+
+            alarm_file = _get_alarm_file(
+                current_alarm_fault
+            )
+
+            if (
+                alarm_file
+                and alarm_file.exists()
+            ):
+
+                st.error(
+                    f"🚨 Alarm system: **{current_alarm_fault.upper()}** "
+                    f"alarm armed"
+                )
+
+            else:
+
+                st.warning(
+                    f"⚠️ Alarm system: {current_alarm_fault} "
+                    f"sound file is missing."
+                )
+
+        # ====================================================
         # SIMULATION CONTROLS
         # ====================================================
 
@@ -1400,7 +1692,9 @@ def show_circuit_builder():
             "sim_history"
         ):
 
-            sample = st.session_state.sim_history[-1]
+            sample = (
+                st.session_state.sim_history[-1]
+            )
 
         else:
 
@@ -1472,12 +1766,30 @@ def show_circuit_builder():
 
             else:
 
+                fault_name = _normalize_fault(
+                    sample["fault"]
+                )
+
                 st.error(
                     f"🚨 Simulation condition: "
-                    f"{sample['fault']} — "
+                    f"{fault_name.upper()} — "
                     f"protection response active for "
                     f"{selected_line}."
                 )
+
+                # ------------------------------------------------
+                # ALARM INFORMATION
+                # ------------------------------------------------
+
+                alarm_file = _get_alarm_file(
+                    fault_name
+                )
+
+                if alarm_file and alarm_file.exists():
+
+                    st.warning(
+                        f"🔊 **{fault_name} alarm active**"
+                    )
 
             # =================================================
             # LIVE CHART
@@ -1487,7 +1799,9 @@ def show_circuit_builder():
                 "#### 📈 Live Generation vs Consumption"
             )
 
-            history = st.session_state.sim_history
+            history = (
+                st.session_state.sim_history
+            )
 
             chart_data = {
                 "Generation (kW)": [
@@ -1514,7 +1828,9 @@ def show_circuit_builder():
                 "sim_running"
             ):
 
-                time.sleep(1.5)
+                time.sleep(
+                    1.5
+                )
 
                 st.rerun()
 
@@ -1549,6 +1865,13 @@ def show_circuit_builder():
             "The displayed circuit condition is currently a "
             "demo injection control and is not itself claimed "
             "to be an AI prediction."
+        )
+
+        st.write(
+            "The circuit protection alarm is triggered directly "
+            "from the simulated circuit condition. This keeps "
+            "the protection alarm independent from the AI model "
+            "prediction."
         )
 
     # ========================================================
@@ -1658,6 +1981,26 @@ def show_circuit_builder():
         "circuit_condition": circuit_condition,
 
         "monitored_load_power": monitored_load_power,
+
+        # ====================================================
+        # ALARM STATE
+        # ====================================================
+
+        "alarm_triggered": (
+            st.session_state.get(
+                "circuit_alarm_triggered",
+                False,
+            )
+        ),
+
+        "alarm_fault": (
+            _normalize_fault(
+                st.session_state.get(
+                    "circuit_previous_fault",
+                    "Normal",
+                )
+            )
+        ),
 
         # ====================================================
         # IMAGE / CIRCUIT STATE
