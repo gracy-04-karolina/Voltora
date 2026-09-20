@@ -5,7 +5,7 @@ import pydeck as pdk
 
 def show_advanced_gis():
 
-    st.title("🛰️ GridGuard AI - Disaster Intelligence Center")
+    st.title("🛰️ Voltora - Disaster Intelligence Center")
 
     # Load city data
     df = pd.read_csv("data/tamilnadu_cities.csv")

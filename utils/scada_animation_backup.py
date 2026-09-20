@@ -408,7 +408,7 @@ animation:bannerFlash .8s infinite;
 <div class="container">
 
 <div class="title">
-⚡ GRIDGUARD AI SCADA
+⚡ Voltora SCADA
 </div>
 
 <div class="status">
@@ -502,7 +502,7 @@ animation:bannerFlash .8s infinite;
 """
     html += """
 <div class="footer">
-GridGuard AI • AI Based LT Fault Detection
+Voltora • AI Based LT Fault Detection
 </div>
 
 </div>

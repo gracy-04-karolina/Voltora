@@ -188,7 +188,7 @@ src="data:image/png;base64,{logo}">
 </div>
 
 <div class="title">
-GRIDGUARD AI
+VOLTORA
 </div>
 
 <div class="sub">

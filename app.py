@@ -49,7 +49,7 @@ HISTORY_FILE = BASE_DIR / "history.csv"
 # ============================================================
 
 st.set_page_config(
-    page_title="GridGuard AI",
+    page_title="Voltora",
     page_icon="⚡",
     layout="wide"
 )
@@ -324,7 +324,7 @@ def predict_fault(
     temperature
 ):
     """
-    Run the trained GridGuard AI model.
+    Run the trained Voltora model.
 
     IMPORTANT:
     The feature order must match the order used when
@@ -943,7 +943,7 @@ if logo_file.exists():
 
 
 st.sidebar.title(
-    "⚡ GridGuard AI"
+    "⚡ Voltora"
 )
 
 
@@ -1132,7 +1132,7 @@ if menu == "🏠 Dashboard":
 
         st.info(
             "Manual electrical values will be analyzed "
-            "by the existing GridGuard AI model."
+            "by the existing Voltora model."
         )
 
     # ========================================================
@@ -1322,7 +1322,7 @@ if menu == "🏠 Dashboard":
 
 11 kV Supply → 11/0.415 kV Transformer →
 R/Y/B/N LT Feeder → Consumers →
-V/I/F/T Sensors → **GridGuard AI** →
+V/I/F/T Sensors → **Voltora** →
 Virtual Relay → Automatic Emergency Shutdown
 
 **Target Line:** `{line_id}`
@@ -1353,7 +1353,7 @@ Virtual Relay → Automatic Emergency Shutdown
 
         st.info(
             "Transformer → MCB → LT Cable → "
-            "Connected Loads → Virtual Sensors → GridGuard AI"
+            "Connected Loads → Virtual Sensors → Voltora"
         )
 
         c1, c2, c3, c4 = st.columns(4)
@@ -1621,7 +1621,7 @@ color:#cbd5e1;
 ">
 
 Sensor measurements →
-<b>GridGuard AI</b> →
+<b>Voltora</b> →
 AI Fault Prediction →
 Virtual Relay →
 Automatic Emergency Shutdown
@@ -1688,7 +1688,7 @@ Automatic Emergency Shutdown
 
         st.success(
             "🔄 Virtual circuit output is connected "
-            "directly to GridGuard AI."
+            "directly to Voltora."
         )
 
     # ========================================================
@@ -1892,7 +1892,7 @@ Automatic Emergency Shutdown
     st.markdown("---")
 
     st.subheader(
-        "🧠 GridGuard AI Fault Detection"
+        "🧠 Voltora Fault Detection"
     )
 
     # ========================================================
@@ -2010,7 +2010,7 @@ Automatic Emergency Shutdown
     if record_saved:
 
         st.success(
-            "Prediction recorded in GridGuard history."
+            "Prediction recorded in Voltora history."
         )
 
     # ========================================================
@@ -2192,7 +2192,7 @@ elif menu == "📋 Fault History":
         st.download_button(
             "⬇ Download History",
             csv,
-            "GridGuard_History.csv",
+            "Voltora_History.csv",
             "text/csv"
         )
 
@@ -2481,7 +2481,7 @@ elif menu == "📄 Reports":
         st.download_button(
             "⬇ Download Complete Report",
             csv,
-            "GridGuard_Report.csv",
+            "Voltora_Report.csv",
             "text/csv"
         )
 
@@ -2579,14 +2579,14 @@ Asset : {latest.get('Asset ID', 'Unknown')}
 elif menu == "ℹ️ About":
 
     st.title(
-        "ℹ️ About GridGuard AI"
+        "ℹ️ About Voltora"
     )
 
     st.markdown(
         """
-# ⚡ GridGuard AI
+# ⚡ Voltora
 
-GridGuard AI is an Artificial Intelligence based Low Tension (LT)
+Voltora is an Artificial Intelligence based Low Tension (LT)
 power distribution fault detection system.
 
 The application predicts:

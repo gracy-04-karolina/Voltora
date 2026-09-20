@@ -43,7 +43,7 @@ def control_room_header():
 
     <div class="title">
 
-        <h1>🛰 GRIDGUARD AI CONTROL CENTER</h1>
+        <h1>🛰 VOLTORA CONTROL CENTER</h1>
 
         <p>
         Live Disaster Intelligence • Smart Grid Monitoring • AI Fault Detection

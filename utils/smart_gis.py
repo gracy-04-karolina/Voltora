@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 
 def show_smart_gis():
 
-    st.title("🛰️ GridGuard AI Smart Disaster Monitoring")
+    st.title("🛰️ Voltora Smart Disaster Monitoring")
 
     df = pd.read_csv("data/tamilnadu_cities.csv")
 

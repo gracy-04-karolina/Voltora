@@ -16,7 +16,7 @@ def show_plotly_map():
     fault = st.session_state.get("fault", "Normal")
     fault_connection = get_fault_connection(fault)
     
-    st.title("🛰️ GridGuard AI - Disaster Intelligence Center")
+    st.title("🛰️ Voltora - Disaster Intelligence Center")
     show_alarm_panel(fault)
     if fault != "Normal":
 

@@ -19,7 +19,7 @@ f"""
 
 <hr/>
 
-<b>GridGuard AI</b><br/>
+<b>Voltora</b><br/>
 
 AI-Based LT Line Fault Detection & Automatic Emergency Shutdown<br/><br/>
 
@@ -47,7 +47,7 @@ def add_footer(canvas, doc):
     canvas.drawString(
         20 * mm,
         10 * mm,
-        "GridGuard AI | Confidential Engineering Report"
+        "Voltora | Confidential Engineering Report"
     )
 
     canvas.drawRightString(

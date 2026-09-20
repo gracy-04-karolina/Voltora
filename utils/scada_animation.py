@@ -465,7 +465,7 @@ left:100%;
 <div class="container">
 
 <div class="title">
-⚡ GRIDGUARD AI SCADA
+⚡ Voltora SCADA
 </div>
 
 <div class="status">
@@ -635,7 +635,7 @@ background:#bbbbbb;
 """
     html += """
 <div class="footer">
-GridGuard AI
+Voltora
 AI Based LT Line Fault Detection & Automatic Emergency Shutdown
 </div>
 

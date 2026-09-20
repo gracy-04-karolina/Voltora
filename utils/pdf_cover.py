@@ -52,7 +52,7 @@ def create_cover_page(
 
     title = Paragraph(
         """
-        <font size=26 color='#003366'><b>GRIDGUARD AI</b></font>
+        <font size=26 color='#003366'><b>VOLTORA</b></font>
         """,
         styles["Title"]
     )
@@ -150,7 +150,7 @@ def create_cover_page(
 
     summary = f"""
 
-    GridGuard AI continuously monitors the Low Tension (LT) electrical
+    Voltora continuously monitors the Low Tension (LT) electrical
     distribution network using Artificial Intelligence.
 
     During this monitoring cycle, the AI detected the fault

@@ -36,7 +36,7 @@ def generate_pdf(
 ):
 
     filename = (
-        "GridGuard_Report_" +
+        "Voltora_Report_" +
         datetime.now().strftime("%Y%m%d_%H%M%S") +
         ".pdf"
     )

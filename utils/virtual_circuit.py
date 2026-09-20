@@ -1,5 +1,5 @@
 """
-GridGuard AI - Virtual LT Circuit Simulator
+Voltora - Virtual LT Circuit Simulator
 
 Simplified educational LT feeder model:
 
@@ -11,7 +11,7 @@ Connected Load
    ↓
 Virtual Sensors
    ↓
-GridGuard AI
+Voltora
 
 The simulation is software-only. Electrical values are
 calculated from the selected load and cable parameters.

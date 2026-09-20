@@ -11,7 +11,7 @@ ASSET_FILE = os.path.join(
 
 
 def load_assets():
-    """Load all GridGuard assets."""
+    """Load all Voltora assets."""
     if not os.path.exists(ASSET_FILE):
         return pd.DataFrame()
 

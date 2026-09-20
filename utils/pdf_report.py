@@ -20,7 +20,7 @@ def generate_pdf(
 
     story = []
 
-    story.append(Paragraph("<b>GRIDGUARD AI</b>", styles["Title"]))
+    story.append(Paragraph("<b>VOLTORA</b>", styles["Title"]))
 
     story.append(Paragraph("Electrical Fault Report", styles["Heading2"]))
 

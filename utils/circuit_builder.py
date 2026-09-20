@@ -1,4 +1,4 @@
-"""GridGuard AI - upgraded circuit diagram input + simulation module.
+"""Voltora - upgraded circuit diagram input + simulation module.
 
 This module keeps the existing show_circuit_builder() entry point and includes:
 - Grid Area / Line / Asset selection
@@ -689,7 +689,7 @@ def show_circuit_builder():
     )
 
     st.info(
-        "Software-only GridGuard AI demo. Upload a circuit diagram, "
+        "Software-only Voltora AI demo. Upload a circuit diagram, "
         "inspect the detected visual structure, build the editable "
         "virtual circuit, then press Run Simulation. Values are "
         "simulated; no physical hardware is connected."
@@ -1510,7 +1510,7 @@ def show_circuit_builder():
                 margin:8px auto;
                 max-width:320px;
             ">
-                🧠 <b>GRIDGUARD AI</b><br>
+                🧠 <b> VOLTORA </b><br>
                 Fault Detection
             </div>
             """,
@@ -1846,7 +1846,7 @@ def show_circuit_builder():
     # ========================================================
 
     with st.expander(
-        "ℹ️ How this connects to GridGuard AI"
+        "ℹ️ How this connects to Voltora"
     ):
 
         st.write(
