@@ -1,0 +1,6 @@
+asset_id,area_id,area_name,line_id,line_name,latitude,longitude,status
+ASSET-001,AREA-01,Area 01,LT-01-001,LT Line 001,13.0827,80.2707,Healthy
+ASSET-002,AREA-01,Area 01,LT-01-002,LT Line 002,13.0870,80.2750,Healthy
+ASSET-003,AREA-01,Area 01,LT-01-003,LT Line 003,13.0900,80.2800,Healthy
+ASSET-004,AREA-02,Area 02,LT-02-001,LT Line 001,11.0168,76.9558,Healthy
+ASSET-005,AREA-02,Area 02,LT-02-002,LT Line 002,11.0200,76.9600,Healthy
