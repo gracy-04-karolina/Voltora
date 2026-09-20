@@ -1,8 +1,10 @@
 \# ⚡ Voltora
 
-
-
 \## AI-Powered Electrical Safety \& Automatic Emergency Shutdown
+
+
+🚀 **[Live Demo](https://voltora-appxz9guzphdgo9cgpyfgqh.streamlit.app/)**  
+💻 **[GitHub Repository](https://github.com/gracy-04-karolina/Voltora)**
 
 
 
